@@ -58,7 +58,7 @@ namespace LeanCloud.Realtime
             request.downloadHandler = new DownloadHandlerBuffer();
             yield return request.Send();
 
-            if (request.isHttpError)
+            if (request.isError)
             {
                 onError("can not reach router.");
                 yield break;
