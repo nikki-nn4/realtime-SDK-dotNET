@@ -14,7 +14,7 @@ namespace LeanCloud.Realtime
     /// </summary>
     public class AVRealtimeBehavior : MonoBehaviour
     {
-        private static bool isInitialized = false;
+        // private static bool isInitialized = false;
 
         /// <summary>
         /// The LeanCloud applicationId used in this app. You can get this value from the LeanCloud website.
@@ -38,13 +38,13 @@ namespace LeanCloud.Realtime
         /// <summary>
         /// Initializes the LeanCloud SDK and begins running network requests created by LeanCloud.
         /// </summary>
-        public virtual void Awake()
-        {
-            // Force the name to be `AVRealtimeInitializeBehavior` in runtime.
-            gameObject.name = "AVRealtimeInitializeBehavior";
-        }
+        // public virtual void Awake()
+        // {
+        //     // Force the name to be `AVRealtimeInitializeBehavior` in runtime.
+        //     gameObject.name = "AVRealtimeInitializeBehavior";
+        // }
 
-        public IEnumerator FetchRouter()
+        public IEnumerator FetchRouter(Action onSuccess, Action<string> onError)
         {
             var prefix = applicationID.Substring(0, 8).ToLower();
             var router = string.Format("{0}.rtm.lncld.net", prefix);
@@ -60,19 +60,24 @@ namespace LeanCloud.Realtime
 
             if (request.isHttpError)
             {
-                throw new AVException(AVException.ErrorCode.ConnectionFailed, "can not reach router.", null);
+                onError("can not reach router.");
+                yield break;
+                // throw new AVException(AVException.ErrorCode.ConnectionFailed, "can not reach router.", null);
             }
 
             var result = request.downloadHandler.text;
             var routerState = Json.Parse(result) as IDictionary<string, object>;
             if (routerState.Keys.Count == 0)
             {
-                throw new KeyNotFoundException("Can not get websocket url from server,please check the appId.");
+                onError("Can not get websocket url from server,please check the appId.");
+                yield break;
+                // throw new KeyNotFoundException("Can not get websocket url from server,please check the appId.");
             }
             var ttl = long.Parse(routerState["ttl"].ToString());
             var expire = DateTime.Now.AddSeconds(ttl);
             routerState["expire"] = expire.UnixTimeStampSeconds();
             Server = routerState["server"].ToString();
+            onSuccess();
         }
     }
 }
