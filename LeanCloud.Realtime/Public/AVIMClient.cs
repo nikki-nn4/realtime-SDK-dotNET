@@ -95,7 +95,7 @@ namespace LeanCloud.Realtime
         /// </summary>
         public event EventHandler<AVIMOnInvitedEventArgs> OnInvited;
 
-        public event EventHandler<AVIMMessageEventArgs> OnOfflineMessageReceived;
+        internal event EventHandler<AVIMMessageEventArgs> OnOfflineMessageReceived;
 
         private EventHandler<AVIMSessionClosedEventArgs> m_OnSessionClosed;
         /// <summary>
